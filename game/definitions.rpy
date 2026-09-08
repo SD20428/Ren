@@ -54,8 +54,8 @@ transform fade_out_slow:
 # TODO: asset — 실제 파일 넣은 뒤 주석 해제
 # image bg hallway_night   = "images/bg/hallway_night.png"
 # image bg classroom_dusk  = "images/bg/classroom_dusk.png"
-# image jihye normal       = "images/sprite/jihye_normal.png"
-# image jihye worried      = "images/sprite/jihye_worried.png"
+# image jihye normal       = "images/sprites/jihye_normal.png"
+# image jihye worried      = "images/sprites/jihye_worried.png"
 
 # 에셋 없이 테스트할 때 쓰는 임시 색판
 image bg placeholder = "#141a1c"

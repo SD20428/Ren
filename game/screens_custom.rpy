@@ -76,13 +76,23 @@ screen clue_notebook():
 ## 퀵메뉴에 수첩 버튼 추가 ######################################################
 # screens.rpy 의 quick_menu 를 고치지 않고 얹는 방식.
 
+# 단서가 하나도 없으면 아예 그리지 않는다. 회색 버튼이 계속 보이는 것보다 낫다.
+# 챕터 카드와 엔딩 문구 위에는 뜨지 않는다 — 연출이 깨진다.
 screen clue_button():
     zorder 50
-    textbutton "수첩":
-        xalign 0.985
-        yalign 0.02
-        action Show("clue_notebook")
-        sensitive len(clues) > 0
+
+    # 스플래시/메인메뉴에서는 default 변수가 아직 없다. getattr 로 막는다.
+    if getattr(store, "clues", None) and not renpy.get_screen("chapter_card") and not getattr(store, "suppress_clue_button", False):
+        textbutton "수첩":
+            xalign 0.985
+            yalign 0.02
+            action Show("clue_notebook")
+
+
+# 엔딩·연출 구간에서 버튼을 감출 때 쓴다.
+#   $ suppress_clue_button = True
+# 세이브에 남는 값이라 default 로 선언한다. 이름 바꾸면 세이브가 깨진다.
+default suppress_clue_button = False
 
 init python:
     # 게임 중 항상 표시. 필요 없으면 이 줄만 지우면 된다.

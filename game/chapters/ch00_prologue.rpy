@@ -7,12 +7,13 @@
 # 이 파일은 연출 유틸 사용법 예시를 겸한다. 대사는 전부 교체 대상.
 
 label chapter_00:
+    $ begin_chapter(0)
 
     scene bg placeholder with dread
     # TODO: asset — scene bg hallway_night
 
-    play ambient "audio/ambient_rain.ogg" fadein 2.0
-    # TODO: asset
+    # TODO: asset — audio/bgm 또는 audio/sfx 에 빗소리 파일 넣고 아래 두 줄 주석 해제
+    # play ambient "audio/sfx/ambient_rain.ogg" fadein 2.0
 
     me "복도 끝 형광등이 나갔다 켜졌다 한다."
 
@@ -38,6 +39,6 @@ label chapter_00:
     scene black with wipe_dark
     centered "{i}그날 밤, 나는 4층으로 올라갔다.{/i}"
 
-    stop ambient fadeout 2.0
+    # stop ambient fadeout 2.0
 
     return

@@ -9,7 +9,7 @@ init offset = -2
 ## Calling gui.init resets the styles to sensible default values, and sets the
 ## width and height of the game.
 init python:
-    gui.init(1280, 720)
+    gui.init(1920, 1080)
 
 ## Enable checks for invalid or unstable properties in screens or transforms
 define config.check_conflicting_properties = True
@@ -88,8 +88,8 @@ define gui.title_text_size = gui.scale(50)
 ## Main and Game Menus #########################################################
 
 ## The images used for the main and game menus.
-define gui.main_menu_background = "gui/main_menu.png"
-define gui.game_menu_background = "gui/game_menu.png"
+define gui.main_menu_background = "#0d1214"   # TODO: asset — 실제 배경 넣으면 "images/bg/title.png" 로
+define gui.game_menu_background = "#0d1214"   # TODO: asset
 
 
 ## Dialogue ####################################################################

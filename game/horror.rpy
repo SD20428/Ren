@@ -7,7 +7,10 @@
 #   "{clue}탄 편지{/clue}를 주머니에 넣었다."
 ################################################################################
 
-# --- 화면 흔들림 --------------------------------------------------------------
+# --- 흔들림 -------------------------------------------------------------------
+# 둘은 쓰는 데가 다르다. 헷갈리지 말 것.
+#   shake        : 스프라이트/이미지 하나만 떤다.  show jihye at at_center, shake
+#   shake_screen : 화면 전체를 때린다(아래 함수).  $ shake_screen(2)
 transform shake(n=6, mag=12):
     block:
         linear 0.02 xoffset mag yoffset -mag
@@ -42,12 +45,17 @@ transform breathe:
 
 
 # --- 서서히 붉어짐 ------------------------------------------------------------
+# 첫 줄의 항등 matrixcolor 를 지우지 마라. 시작값이 없으면 Ren'Py 가 보간을
+# 포기하고 최종값으로 즉시 튄다. 곱셈 구조(TintMatrix * SaturationMatrix)도
+# 위아래가 같아야 보간된다.
 transform creeping_red(t=4.0):
+    matrixcolor TintMatrix("#ffffff") * SaturationMatrix(1.0)
     linear t matrixcolor TintMatrix("#c48b8b") * SaturationMatrix(0.7)
 
 
 # --- 초점 흐려짐 (정신력 낮을 때) ---------------------------------------------
 transform losing_it(t=2.5):
+    matrixcolor SaturationMatrix(1.0) * BrightnessMatrix(0.0)
     linear t matrixcolor SaturationMatrix(0.25) * BrightnessMatrix(-0.15)
 
 

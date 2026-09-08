@@ -6,6 +6,8 @@
 ################################################################################
 
 # 주인공 — 이름표 없이 나오는 독백/속마음
+# nvl_narrator 와 centered 는 Ren'Py 빌트인 이름이다. 여기서 의도적으로 덮는다.
+# lint 가 "replaces a Ren'Py built-in name" 경고를 내지만 정상이다.
 define nvl_narrator = Character(None, kind=nvl)
 
 # 화면 중앙 정렬 (엔딩, 장면 전환 문구)

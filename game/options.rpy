@@ -14,7 +14,7 @@
 ##
 ## The _() surrounding the string marks it as eligible for translation.
 
-define config.name = _("Ren'Py 7 Default GUI")
+define config.name = _("제목 미정")   # TODO: 스토어 제목 확정되면 여기만 바꾼다
 
 
 ## Determines if the title given above is shown on the main menu
@@ -39,7 +39,7 @@ define gui.about = _p("""
 ## built distribution. This must be ASCII-only, and must not contain
 ## spaces, colons, or semicolons.
 
-define build.name = "gui"
+define build.name = "story-mystery"
 
 
 ## Sounds and music ############################################################
@@ -50,7 +50,7 @@ define build.name = "gui"
 
 define config.has_sound = True
 define config.has_music = True
-define config.has_voice = True
+define config.has_voice = False   # 음성 안 쓴다. 믹서에서 숨긴다
 
 
 ## To allow the user to play a test sound on the sound or voice channel,
@@ -146,7 +146,9 @@ default preferences.afm_time = 15
 ## This generally should not be changed, and if it is, should always be a
 ## literal string, not an expression.
 
-define config.save_directory = "gui-7"
+# 경고: 출시 후 이 값을 바꾸면 플레이어 세이브 경로가 달라져서 세이브를 못 찾는다.
+#       게임 제목이 바뀌어도 이 문자열은 그대로 둔다.
+define config.save_directory = "story-mystery"
 
 
 ## Icon ########################################################################

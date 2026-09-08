@@ -6,7 +6,7 @@
 # 이 파일은 템플릿이다. 구조만 유지하고 내용은 교체한다.
 
 label chapter_01:
-
+    $ begin_chapter(1)
     call screen chapter_card(1, "장 제목")
 
     scene bg placeholder with dread
