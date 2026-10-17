@@ -105,6 +105,33 @@ canvas{width:100%;height:290px;border:1px solid var(--line);border-radius:14px;b
   <h3>오류 비용</h3><label>위음성 1건 = 위양성 몇 건? <span class="val" id="vW">30</span></label><input type="range" id="wgt" min="1" max="500" step="1" value="30"><div class="hint">가중치뿐 아니라 질병 비율도 비용 최소 기준값을 바꿉니다. 이 가중치는 실측치가 아니라 의사결정 가정입니다.</div>
  </section>
  <section class="card"><h2>ROC와 비용 최소점</h2><div class="kpis"><div class="kpi"><b id="rSe">—</b><span>현재 기준 민감도</span></div><div class="kpi"><b id="rSp">—</b><span>현재 기준 특이도</span></div><div class="kpi"><b id="rAUC">—</b><span>AUC</span></div><div class="kpi"><b id="rCost">—</b><span>상대비용 /1,000건</span></div></div><canvas id="cROC"></canvas><div class="note" id="rocNote"></div></section>
+ <section class="card" style="grid-column:1/-1">
+  <h2>재검사 전략 최적화</h2>
+  <div class="hint">위 ROC의 분포 분리도와 질병 비율, 상단 표본 크기를 사용합니다. 1·2차 기준값과 재검사 대상을 함께 바꾸어 가중 손실이 가장 작은 조합을 찾습니다.</div>
+  <div class="split3">
+   <div><label for="optD2">2차 분포 분리도 d′</label><input type="number" id="optD2" min="0.3" max="4" step="0.01" value="1.73"></div>
+   <div><label for="optFn">위음성 1명 손실</label><input type="number" id="optFn" min="0" max="1000000000" step="1" value="200"></div>
+   <div><label for="optFp">위양성 1명 손실</label><input type="number" id="optFp" min="0" max="1000000000" step="0.1" value="1"></div>
+   <div><label for="optTest">검사 1회 비용</label><input type="number" id="optTest" min="0" max="1000000000" step="0.01" value="0.01"></div>
+   <div><label for="optMinSe">최소 최종 민감도 (%)</label><input type="number" id="optMinSe" min="0" max="100" step="1" value="0"></div>
+   <div><label for="optMaxRetest">최대 재검사 비율 (%)</label><input type="number" id="optMaxRetest" min="0" max="100" step="1" value="100"></div>
+  </div>
+  <div class="formula">총 손실 = FN × 위음성 손실 + FP × 위양성 손실 + 총 검사 횟수 × 검사 비용</div>
+  <div class="hint">이 기능의 손실 가중치는 위 단일검사 ROC의 오류 가중치와 별도로 설정합니다. 탐색 중 두 검사의 d′는 고정하며 기준값 −4~8을 0.1 간격으로 비교합니다.</div>
+  <button class="b" id="optRun" type="button">최소 손실 조합 찾기</button>
+  <button class="b" id="optExport" type="button" disabled>결과 CSV 저장</button>
+  <div class="hint" id="optStatus" aria-live="polite"></div>
+  <div id="optSummary"></div>
+  <div id="optGraph" hidden>
+   <h3>재검사 전략별 ROC 성능 비교</h3>
+   <canvas id="optCanvas" style="height:360px" role="img" aria-label="전략별 가능한 위양성률과 민감도, 최소 손실 조합"></canvas>
+   <div id="optLegend" class="lg"></div>
+   <div class="hint">가로축은 위양성률(1−특이도), 세로축은 민감도입니다. 옅은 점들은 제약조건을 만족하는 기준값 조합, 번호가 붙은 큰 점은 각 전략의 최소 손실 조합입니다. 검은 테두리는 전체 최소 손실입니다. 겹친 점은 아래 범례와 표에서 구분할 수 있습니다. 점선은 1·2차 개별 검사 ROC이며, 재검사 전략은 기준값이 두 개이므로 하나의 ROC 곡선 대신 가능한 조합을 표시합니다.</div>
+  </div>
+  <div style="overflow-x:auto"><table id="optTable"></table></div>
+  <div id="optComparison" class="hint"></div>
+  <div class="note w">동일분산 정규분포, 질병 유무에 따른 두 검사의 조건부 독립, 검사 사이 질병 상태 고정을 가정합니다. 재검사자는 2차 결과만 최종 판정에 사용합니다. 결과는 임상 권고가 아닌 탐색 범위 안의 교육용 최소 손실이며, 동률이면 재검사량이 적은 조합을 우선합니다. 실제 관측값이 아닌 기대 인원입니다.</div>
+ </section>
 </div>
 
 <div class="grid" id="p-bias" style="display:none">

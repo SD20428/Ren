@@ -1,0 +1,2 @@
+﻿"prevalence_percent","sample_size","sensitivity1_percent","specificity1_percent","sensitivity2_percent","specificity2_percent","first_tp","first_tn","first_fp","first_fn","positive_only_TP","positive_only_TN","positive_only_FP","positive_only_FN","negative_only_TP","negative_only_TN","negative_only_FP","negative_only_FN","all_TP","all_TN","all_FP","all_FN"
+"1","100000","90","90","90","90","900","89100","9900","100","810","98010","990","190","990","80190","18810","10","900","89100","9900","100"
