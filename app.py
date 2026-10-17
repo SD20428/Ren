@@ -35,6 +35,17 @@ def calculate_bayes():
     return jsonify(api.bayes(float(data["prevalence"]), float(data["sensitivity"]), float(data["specificity"])))
 
 
+@app.post("/api/retest")
+def calculate_retest():
+    data = request.get_json(force=True)
+    try:
+        values = [float(data[key]) for key in
+                  ("prevalence", "sensitivity", "specificity", "sensitivity2", "specificity2")]
+        return jsonify(api.retest(*values))
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return jsonify(error="확률 입력값을 확인해 주세요."), 400
+
+
 @app.post("/api/reconstruct")
 def calculate_reconstruction():
     data = request.get_json(force=True)

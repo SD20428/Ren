@@ -40,6 +40,25 @@ class DiagnosticApi:
             "ppv": ppv, "npv": npv, "curve": curve,
         }
 
+    def retest(self, prevalence, sensitivity, specificity, sensitivity2, specificity2):
+        """Conditional independence; disease status stays fixed between tests."""
+        if any(not math.isfinite(v) or not 0 <= v <= 1 for v in
+               (prevalence, sensitivity, specificity, sensitivity2, specificity2)):
+            raise ValueError("확률 범위 오류")
+        branches = []
+        for first in (True, False):
+            d1 = prevalence * (sensitivity if first else 1 - sensitivity)
+            h1 = (1 - prevalence) * (1 - specificity if first else specificity)
+            for second in (True, False):
+                d2 = d1 * (sensitivity2 if second else 1 - sensitivity2)
+                h2 = h1 * (1 - specificity2 if second else specificity2)
+                total = d2 + h2
+                branches.append(dict(first=first, second=second,
+                    firstPosterior=d1 / (d1 + h1) if d1 + h1 else None,
+                    posterior=d2 / total if total else None,
+                    probability=total, count=1000 * total, diseased=1000 * d2))
+        return dict(prevalence=prevalence, branches=branches)
+
     def reconstruct(self, year: str) -> dict:
         d = KNCSP[str(year)]
         n = 1000.0

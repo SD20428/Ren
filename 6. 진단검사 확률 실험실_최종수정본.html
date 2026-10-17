@@ -38,8 +38,13 @@ canvas{width:100%;height:290px;border:1px solid var(--line);border-radius:14px;b
 <body>
 <header><div class="header-inner"><div class="eyebrow">Diagnostic Test Probability Lab</div><h1>진단검사 확률 실험실</h1><p>한국 국가암검진 실측값으로 확률 구조를 확인하고, ROC의 의사결정과 검진 편향을 개념 모형으로 분리해 탐구합니다.</p></div></header>
 <main>
+<div class="card" style="margin-bottom:16px;padding:12px 18px">
+<label for="sampleSize" style="margin-top:0">1차·재검사 표본 크기</label>
+<select id="sampleSize"><option value="1000">1,000명</option><option value="10000">10,000명</option><option value="100000" selected>100,000명 (기본)</option><option value="1000000">1,000,000명</option></select>
+<div class="hint">1차 검사와 재검사 결과에 적용됩니다. 확률은 그대로이며 표본 수에 비례해 예상 인원이 늘어납니다. 무작위 추출 결과가 아닌 계산된 기대 인원입니다.</div></div>
 <div class="tabs">
  <button data-t="bayes" aria-pressed="true">1. 양성예측도</button>
+ <button data-t="retest" aria-pressed="false">재검사 확률</button>
  <button data-t="recon" aria-pressed="false">2. 분할표 재구성</button>
  <button data-t="roc" aria-pressed="false">3. ROC와 오류 비용</button>
  <button data-t="bias" aria-pressed="false">4. 검진 편향 모형</button>
@@ -55,11 +60,34 @@ canvas{width:100%;height:290px;border:1px solid var(--line);border-radius:14px;b
   <div class="hint" id="srcNote"></div>
   <div class="note w">낮은 양성예측도는 낮은 질병 비율과 제한된 특이도가 함께 만든 결과입니다. 특히 선별검사처럼 사전확률이 낮은 상황에서는 위양성이 양성 결과의 큰 부분을 차지할 수 있습니다.</div>
  </section>
- <section class="card"><h2>1,000건으로 환산한 결과</h2><div class="kpis"><div class="kpi"><b id="kPPV">—</b><span>양성예측도</span></div><div class="kpi"><b id="kNPV">—</b><span>음성예측도</span></div><div class="kpi"><b id="kPos">—</b><span>양성 판정</span></div><div class="kpi"><b id="kFP">—</b><span>위양성</span></div></div>
-  <div class="icons" id="icons"></div><div class="lg"><span><em style="background:var(--tp)"></em>진짜 양성</span><span><em style="background:var(--fp)"></em>위양성</span><span><em style="background:var(--fn)"></em>위음성</span><span><em style="background:var(--tn)"></em>진짜 음성</span></div>
+ <section class="card"><h2 id="sampleHeading">100,000명으로 환산한 결과</h2><div class="kpis"><div class="kpi"><b id="kPPV">—</b><span>양성예측도</span></div><div class="kpi"><b id="kNPV">—</b><span>음성예측도</span></div><div class="kpi"><b id="kPos">—</b><span>양성 판정</span></div><div class="kpi"><b id="kFP">—</b><span>위양성</span></div></div>
+  <div id="icons" class="split3" style="grid-template-columns:repeat(2,minmax(0,1fr));margin:12px 0"></div><div class="lg"><span><em style="background:var(--tp)"></em>진짜 양성</span><span><em style="background:var(--fp)"></em>위양성</span><span><em style="background:var(--fn)"></em>위음성</span><span><em style="background:var(--tn)"></em>진짜 음성</span></div>
   <table id="t2x2"></table><div class="note" id="bayesNote"></div><h3>질병 비율에 따른 양성예측도</h3><canvas id="cPPV"></canvas>
  </section>
 </div>
+
+<div class="grid" id="p-retest" style="display:none">
+<section class="card soft"><h2>2차 검사 조건</h2>
+<div class="note">검사 전 확률과 1차 검사 성능은 <b>1. 양성예측도</b> 탭의 설정을 함께 사용합니다.</div>
+<div id="retestSettings" class="hint"></div>
+<label for="retestTarget">2차 검사 대상</label>
+<select id="retestTarget"><option value="positive">1차 양성으로 판정된 사람만</option><option value="negative">1차 음성으로 판정된 사람만</option><option value="all" selected>모든 사람</option></select>
+<div class="note" id="retestPopulation" aria-live="polite"></div>
+<label for="sameTest"><input type="checkbox" id="sameTest" checked> 1차와 같은 민감도·특이도 사용</label>
+<div class="hint">같은 성능이라는 설정이며 실제 반복 검사의 독립성을 뜻하지 않습니다.</div>
+<label for="se2">2차 민감도 <span class="val" id="vSe2"></span></label><input type="range" id="se2" min="0" max="100" step="0.1" value="68.93">
+<label for="sp2">2차 특이도 <span class="val" id="vSp2"></span></label><input type="range" id="sp2" min="0" max="100" step="0.1" value="89.09">
+<div class="hint">연결을 해제하면 다른 2차 검사의 성능을 가정할 수 있습니다. 별도 실측 자료가 없는 교육용 설정입니다.</div>
+<div class="note w"><b>교육용 모형의 가정</b><br>질병 유무가 주어졌을 때 두 검사 결과는 조건부 독립이며 두 검사 사이 질병 상태는 변하지 않습니다. 같은 원인으로 오류가 반복되면 재검사의 정보 효과를 과장할 수 있습니다. 시간이 지나 새로 발생하는 위암 위험은 반영하지 않습니다.</div>
+<div class="hint"><a href="https://pubmed.ncbi.nlm.nih.gov/11252592/" target="_blank" rel="noopener noreferrer">검사 간 조건부 의존성 관련 연구</a></div></section>
+<section class="card"><h2>검사 전 → 1차 결과 후 → 2차 결과 후</h2>
+<div class="hint">경로를 선택하면 위암 확률 변화를 볼 수 있습니다. 선택한 표본 중 해당 대상에게만 2차 검사를 시행하는 가상 비교입니다. 재검사 미실시자는 1차 결과 후 확률을 유지합니다.</div>
+<div id="retestError" role="alert" class="hint"></div><div id="retestJourney" aria-live="polite" style="margin-top:14px"></div>
+<h3>검사 대상에 따른 결과 경로</h3><div style="overflow-x:auto"><table id="retestTable"></table></div>
+<div class="note" id="retestNote"></div>
+<div class="formula">1차 결과 후 확률 p₁, 2차 민감도 Se₂, 특이도 Sp₂<br>2차 양성 후 = p₁ × Se₂ / [p₁ × Se₂ + (1 − p₁) × (1 − Sp₂)]<br>2차 음성 후 = p₁ × (1 − Se₂) / [p₁ × (1 − Se₂) + (1 − p₁) × Sp₂]</div>
+<div class="hint">‘경로 발생 확률’은 전체 사람 중 해당 결과 조합을 얻을 비율, ‘위암 확률’은 그 조합을 얻은 사람 중 위암인 비율입니다. 예상 인원은 소수로 표시합니다. 발생 확률이 0인 경로의 위암 확률은 정의되지 않습니다.</div>
+</section></div>
 
 <div class="grid" id="p-recon" style="display:none">
  <section class="card soft"><h2>공표값에서 2×2 표 재구성</h2><div class="hint">핵심은 <b>값의 크기보다 분모의 정의</b>입니다. CDR은 전체 검사 1,000건당, ICR은 음성 검사 1,000건당입니다.</div>

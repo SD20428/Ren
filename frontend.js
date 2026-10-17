@@ -1,4 +1,6 @@
 const $ = id => document.getElementById(id);
+const sampleSize = () => +$('sampleSize').value;
+const sampleLabel = () => sampleSize().toLocaleString('ko-KR');
 
 const PRESETS = {
   kncsp20:{se:68.93,sp:89.09,prev:0.44946,n:'KNCSP 2020: RR 11.17%, CDR 3.10/1000 전체 검사, ICR 1.57/1000 음성 검사. 분모를 맞춰 환산한 유효 사전확률 약 0.449%.'},
@@ -32,16 +34,16 @@ async function renderBayes(){
   const prev=Math.pow(10,+$('prev').value),se=+$('se').value/100,sp=+$('sp').value/100;
   $('vPrev').textContent=(prev*100).toFixed(prev<.001?4:3)+'%';
   $('vSe').textContent=(se*100).toFixed(1)+'%'; $('vSp').textContent=(sp*100).toFixed(1)+'%';
-  const r=await api().bayes(prev,se,sp), {TP,FN,TN,FP,D}=r;
+  const r=await api().bayes(prev,se,sp), scale=sampleSize()/r.N;
+  const {TP,FN,TN,FP,D}=Object.fromEntries(['TP','FN','TN','FP','D'].map(key=>[key,r[key]*scale]));
+  $('sampleHeading').textContent=sampleLabel()+'명으로 환산한 결과';
   $('kPPV').textContent=(r.ppv*100).toFixed(2)+'%'; $('kNPV').textContent=(r.npv*100).toFixed(2)+'%';
   $('kPos').textContent=(TP+FP).toFixed(1)+'건'; $('kFP').textContent=FP.toFixed(1)+'건';
-  const counts=[[Math.round(TP),'#24946e'],[Math.round(FN),'#c95d6c'],[Math.round(FP),'#e49a55']];
-  let h=''; counts.forEach(([n,col])=>{for(let i=0;i<n;i++)h+='<i style="background:'+col+'"></i>';});
-  for(let i=counts.reduce((s,x)=>s+x[0],0);i<1000;i++)h+='<i style="background:#c8d8dc"></i>';
-  $('icons').innerHTML=h;
-  $('t2x2').innerHTML='<tr><th>1,000건 기준</th><th>검사 양성</th><th>검사 음성</th><th>합계</th></tr><tr><td>실제 병 있음</td><td>'+TP.toFixed(2)+'</td><td>'+FN.toFixed(2)+'</td><td>'+D.toFixed(2)+'</td></tr><tr><td>실제 병 없음</td><td>'+FP.toFixed(2)+'</td><td>'+TN.toFixed(2)+'</td><td>'+(1000-D).toFixed(2)+'</td></tr><tr><td>합계</td><td>'+(TP+FP).toFixed(2)+'</td><td>'+(TN+FN).toFixed(2)+'</td><td>1000</td></tr>';
+  $('icons').innerHTML=[['진짜 양성',TP,'#24946e'],['위음성',FN,'#c95d6c'],['위양성',FP,'#e49a55'],['진짜 음성',TN,'#61777d']].map(([label,n,color])=>'<div class="mini" style="border-left:5px solid '+color+'"><h4>'+label+'</h4><div style="font-size:24px;font-weight:900;color:'+color+'">'+n.toLocaleString('ko-KR',{minimumFractionDigits:2,maximumFractionDigits:2})+'명</div><div class="hint">전체의 '+(n/sampleSize()*100).toFixed(4)+'%</div></div>').join('');
+  $('t2x2').innerHTML='<tr><th>'+sampleLabel()+'명 기준</th><th>검사 양성</th><th>검사 음성</th><th>합계</th></tr><tr><td>실제 병 있음</td><td>'+TP.toFixed(2)+'</td><td>'+FN.toFixed(2)+'</td><td>'+D.toFixed(2)+'</td></tr><tr><td>실제 병 없음</td><td>'+FP.toFixed(2)+'</td><td>'+TN.toFixed(2)+'</td><td>'+(sampleSize()-D).toFixed(2)+'</td></tr><tr><td>합계</td><td>'+(TP+FP).toFixed(2)+'</td><td>'+(TN+FN).toFixed(2)+'</td><td>'+sampleLabel()+'</td></tr>';
   $('bayesNote').innerHTML='양성 판정 약 <b>'+(TP+FP).toFixed(1)+'건</b> 가운데 진짜 양성은 <b>'+TP.toFixed(2)+'건</b>입니다. 진짜 양성 1건당 위양성은 약 <b class="big">'+(FP/Math.max(TP,1e-9)).toFixed(1)+'건</b>입니다.';
   drawPPV(r.curve,prev,r.ppv);
+  if($('p-retest').style.display!=='none')renderRetest();
 }
 
 function drawPPV(curve,prev,ppv){
@@ -89,11 +91,56 @@ function drawBias(pairs,du,ds){
 }
 
 function bind(){
-  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));['bayes','recon','roc','bias'].forEach(t=>$('p-'+t).style.display=t===b.dataset.t?'grid':'none');if(b.dataset.t==='roc')drawROC();if(b.dataset.t==='bias')runBias();});
+  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));['bayes','retest','recon','roc','bias'].forEach(t=>$('p-'+t).style.display=t===b.dataset.t?'grid':'none');if(b.dataset.t==='retest')renderRetest();if(b.dataset.t==='roc')drawROC();if(b.dataset.t==='bias')runBias();});
   document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-p]').forEach(x=>x.classList.remove('on'));b.classList.add('on');const p=PRESETS[b.dataset.p];$('se').value=p.se;$('sp').value=p.sp;setLogSlider('prev',p.prev);$('srcNote').textContent=p.n;renderBayes();});
   ['prev','se','sp'].forEach(id=>$(id).oninput=renderBayes);$('yr').onchange=renderRecon;['dp','cut','prev2','wgt'].forEach(id=>$(id).oninput=drawROC);['lead','slow','non','eff'].forEach(id=>$(id).oninput=runBias);
   addEventListener('resize',()=>{renderBayes();if($('p-roc').style.display==='grid')drawROC();if($('p-bias').style.display==='grid')runBias();});
+  $('sampleSize').onchange=()=>{renderBayes();if(retestData)drawRetest();};
+  $('retestTarget').onchange=()=>{retestSelected=0;if(retestData)drawRetest();};
+  ['sameTest','se2','sp2'].forEach(id=>$(id).oninput=renderRetest);
   $('srcNote').textContent=PRESETS.kncsp20.n;renderBayes();renderRecon();
 }
 
 window.addEventListener('DOMContentLoaded',bind);
+
+let retestData=null, retestSelected=0, retestRequest=0;
+const retestPct = v => v===null ? '정의되지 않음' : (v*100).toFixed(4)+'%';
+async function renderRetest(){
+  const request=++retestRequest;
+  const prevalence=10**(+$('prev').value),sensitivity=+$('se').value/100,specificity=+$('sp').value/100;
+  const linked=$('sameTest').checked;
+  if(linked){$('se2').value=$('se').value;$('sp2').value=$('sp').value;}
+  $('se2').disabled=linked;$('sp2').disabled=linked;
+  const sensitivity2=linked?sensitivity:+$('se2').value/100,specificity2=linked?specificity:+$('sp2').value/100;
+  $('vSe2').textContent=(sensitivity2*100).toFixed(2)+'%';$('vSp2').textContent=(specificity2*100).toFixed(2)+'%';
+  $('retestSettings').textContent='검사 전 위암 확률 '+retestPct(prevalence)+' · 1차 민감도 '+(sensitivity*100).toFixed(2)+'% · 특이도 '+(specificity*100).toFixed(2)+'%';
+  try{
+    const result=await post('retest',{prevalence,sensitivity,specificity,sensitivity2,specificity2});
+    if(request!==retestRequest)return;
+    retestData=result;$('retestError').textContent='';drawRetest();
+  }catch(error){if(request!==retestRequest)return;$('retestError').textContent='계산하지 못했습니다. 설정을 변경하거나 다시 시도해 주세요.';$('retestJourney').innerHTML='';$('retestTable').innerHTML='';$('retestNote').textContent='';}
+}
+function drawRetest(){
+  const target=$('retestTarget').value,raw={...retestData,branches:retestData.branches.map(x=>({...x,count:x.count*sampleSize()/1000,diseased:x.diseased*sampleSize()/1000}))},branches=[];
+  let tested=0;
+  for(const first of [true,false]){
+    const group=raw.branches.filter(x=>x.first===first);
+    if(target==='all'||(target==='positive'&&first)||(target==='negative'&&!first)){
+      branches.push(...group);tested+=group.reduce((sum,x)=>sum+x.count,0);
+    }else{
+      const probability=group.reduce((sum,x)=>sum+x.probability,0);
+      branches.push({first,second:null,firstPosterior:group[0].firstPosterior,
+        posterior:group[0].firstPosterior,probability,count:sampleSize()*probability,
+        diseased:group.reduce((sum,x)=>sum+x.diseased,0)});
+    }
+  }
+  const r={...raw,branches};
+  if(retestSelected>=branches.length)retestSelected=0;
+  const b=r.branches[retestSelected],sign=v=>v?'양성':'음성';
+  $('retestPopulation').textContent=sampleLabel()+'명 기준 · 2차 검사 대상 '+tested.toFixed(3)+'명 · 재검사 미실시 '+(sampleSize()-tested).toFixed(3)+'명 · 총 검사 횟수 '+(sampleSize()+tested).toFixed(3)+'회';
+  const stages=[['검사 전',r.prevalence],['1차 '+sign(b.first)+' 후',b.firstPosterior],[b.second===null?'2차 미실시 · 1차 확률 유지':'2차 '+sign(b.second)+' 후',b.posterior]];
+  $('retestJourney').innerHTML='<div class="split3">'+stages.map(([label,p])=>'<div class="mini"><h4>'+label+'</h4><div style="font-size:22px;font-weight:900">'+retestPct(p)+'</div><div class="hint">위암일 확률</div><div style="height:8px;background:#e5f6f2;border-radius:6px;margin-top:10px"><div style="height:100%;border-radius:6px;background:var(--mint);width:'+(p===null?0:p*100)+'%"></div></div></div>').join('')+'</div>';
+  $('retestTable').innerHTML='<tr><th>결과 경로 선택</th><th>경로 발생 확률</th><th>예상 인원 / '+sampleLabel()+'명</th><th>위암 확률</th></tr>'+r.branches.map((x,i)=>'<tr style="background:'+(i===retestSelected?'#e5f6f2':'white')+'"><td><button class="b" data-route="'+i+'" aria-pressed="'+(i===retestSelected)+'">'+sign(x.first)+' → '+(x.second===null?'재검사 미실시':sign(x.second))+'</button></td><td>'+retestPct(x.probability)+'</td><td>'+x.count.toFixed(3)+'명</td><td>'+retestPct(x.posterior)+'</td></tr>').join('');
+  $('retestTable').querySelectorAll('[data-route]').forEach(button=>button.onclick=()=>{retestSelected=+button.dataset.route;drawRetest();});
+  $('retestNote').textContent=b.posterior===null?'이 결과 조합은 현재 설정에서 발생하지 않으므로 위암 확률을 정의할 수 없습니다.':'전체 '+sampleLabel()+'명 중 이 결과 조합은 약 '+b.count.toFixed(3)+'명, 그중 위암은 약 '+b.diseased.toFixed(3)+'명입니다. 이 조합을 얻은 사람의 위암 확률은 '+retestPct(b.posterior)+'입니다.'+(b.second===null?' 이 사람들은 2차 검사를 받지 않아 1차 결과 후 확률을 유지합니다.':'');
+}

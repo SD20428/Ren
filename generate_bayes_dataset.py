@@ -11,7 +11,7 @@ OUTPUT_FILE = HERE / "diagnostic_parameter_sweep.csv"
 
 PREVALENCE_PERCENTS = (0.25, 0.5, 1.0)
 PERCENT_RANGE = range(30, 101)
-SAMPLE_SIZE = 1000
+SAMPLE_SIZE = 100000
 
 FIELDNAMES = (
     "scenario_id",
