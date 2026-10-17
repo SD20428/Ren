@@ -1,0 +1,39 @@
+항목,값,단위,분모_정의,출처,비고
+KNCSP_2020_검진건수,3596204,건,해당 연도 전체 유방촬영 검진,https://doi.org/10.3348/kjr.2024.0866,Table 1
+KNCSP_2020_재소환율,11.17,%,전체 검사,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2020_양성예측도,2.77,%,양성 검사,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2020_민감도,68.93,%,실제 암,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2020_특이도,89.09,%,실제 비암,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2020_위양성률,10.91,%,실제 비암,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2020_암발견율_CDR,3.1,/1000,"전체 검사 1,000건",https://doi.org/10.3348/kjr.2024.0866,Table 2; CDR denominator=all examinations
+KNCSP_2020_중간암률_ICR,1.57,/1000,"음성 검사 1,000건",https://doi.org/10.3348/kjr.2024.0866,Table 2; ICR denominator=negative examinations
+KNCSP_2020_재구성_위음성,1.3946,"건/전체 1,000건",ICR×음성검사수/1000,파생 계산,음성 검사=888.3/1000
+KNCSP_2020_재구성_유효사전확률,0.44946,%,(TP+FN)/전체 검사,파생 계산,CDR과 ICR의 분모를 통일한 근사
+KNCSP_2020_재구성_민감도,68.971,%,TP/(TP+FN),파생 계산,공표 민감도와 반올림 수준 비교
+KNCSP_2009_검진건수,2821132,건,해당 연도 전체 유방촬영 검진,https://doi.org/10.3348/kjr.2024.0866,Table 1
+KNCSP_2009_재소환율,17.18,%,전체 검사,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2009_양성예측도,0.84,%,양성 검사,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2009_민감도,67.3,%,실제 암,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2009_특이도,82.93,%,실제 비암,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2009_위양성률,17.07,%,실제 비암,https://doi.org/10.3348/kjr.2024.0866,Table 2
+KNCSP_2009_암발견율_CDR,1.45,/1000,"전체 검사 1,000건",https://doi.org/10.3348/kjr.2024.0866,Table 2; CDR denominator=all examinations; RR×PPV의 반올림 곱(약 1.44/1000)과 0.01 수준 차이 가능
+KNCSP_2009_중간암률_ICR,0.85,/1000,"음성 검사 1,000건",https://doi.org/10.3348/kjr.2024.0866,Table 2; ICR denominator=negative examinations
+KNCSP_2009_재구성_위음성,0.704,"건/전체 1,000건",ICR×음성검사수/1000,파생 계산,음성 검사=828.2/1000
+KNCSP_2009_재구성_유효사전확률,0.2154,%,(TP+FN)/전체 검사,파생 계산,CDR과 ICR의 분모를 통일한 근사
+KNCSP_2009_재구성_민감도,67.318,%,TP/(TP+FN),파생 계산,공표 민감도와 반올림 수준 비교
+KNCSP_2009_2020_총검진건수,42165405,건,2009-2020 전체,https://doi.org/10.3348/kjr.2024.0866,Abstract/Table 1
+ABCS_K_재소환율,19.1,%,전체 검사,https://doi.org/10.3348/kjr.2016.17.4.489,"2005-2010, 128,756 examinations"
+ABCS_K_양성예측도,1.4,%,양성 검사,https://doi.org/10.3348/kjr.2016.17.4.489,
+ABCS_K_민감도,86.5,%,실제 암,https://doi.org/10.3348/kjr.2016.17.4.489,
+ABCS_K_특이도,81.1,%,실제 비암,https://doi.org/10.3348/kjr.2016.17.4.489,
+ABCS_K_암발견율,2.69,/1000,"전체 검사 1,000건",https://doi.org/10.3348/kjr.2016.17.4.489,
+ABCS_K_중간암률,0.5,/1000,"음성 검사 1,000건",https://doi.org/10.3348/kjr.2016.17.4.489,
+ABCS_K_위양성률,18.9,%,실제 비암,https://doi.org/10.3348/kjr.2016.17.4.489,1-특이도
+ABCS_K_재구성_유효사전확률,0.3095,%,(CDR+환산 FN)/전체 검사,파생 계산,KNCSP와 동일한 분모 환산 규칙; 공표 PPV 1.4%와 내적 정합성 확인
+JSTART_대상자수,72998,명,무증상 40-49세 여성,https://doi.org/10.1016/S0140-6736(15)00774-6,randomized trial
+JSTART_유방촬영단독_민감도,77,%,실제 암,https://doi.org/10.1016/S0140-6736(15)00774-6,95% CI 70.3-83.7
+JSTART_유방촬영단독_특이도,91.4,%,실제 비암,https://doi.org/10.1016/S0140-6736(15)00774-6,95% CI 91.1-91.7
+JSTART_초음파병용_민감도,91.1,%,실제 암,https://doi.org/10.1016/S0140-6736(15)00774-6,95% CI 87.2-95.0
+JSTART_초음파병용_특이도,87.7,%,실제 비암,https://doi.org/10.1016/S0140-6736(15)00774-6,95% CI 87.3-88.0
+한국_갑상선암_2011대1993_진단율배수,15,배,연령표준화 진단율 비교,https://doi.org/10.1056/NEJMp1409841,2011 diagnosis rate vs 1993; mortality remained stable
+검진편향_개념출처,선행시간·길이·과잉진단,개념,암 검진 생존율 해석,https://www.cancer.gov/about-cancer/screening/research/what-screening-statistics-mean,교육용 모형의 개념 근거; 특정 자연사 매개변수 추정치가 아님

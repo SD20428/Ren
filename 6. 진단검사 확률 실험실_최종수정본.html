@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>진단검사 확률 실험실 - 수정본</title>
+<style>
+:root{
+  --bg:#f4fbfa;--card:#ffffff;--ink:#17333a;--mut:#61777d;--line:#d9e9e7;
+  --mint:#2f9d8f;--mint2:#e5f6f2;--sky:#4f8fd8;--sky2:#eaf2fb;
+  --coral:#df7b67;--coral2:#fff0ec;--violet:#8067c8;--violet2:#f1edfb;
+  --tp:#24946e;--fp:#e49a55;--fn:#c95d6c;--tn:#c8d8dc;
+  --shadow:0 10px 30px rgba(28,72,77,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#f1fbf8 0,#f8fbff 45%,#f7f9fb 100%);color:var(--ink);font-family:system-ui,-apple-system,"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif}
+header{background:linear-gradient(120deg,#1f8579,#4d8fd5);color:#fff;padding:30px 28px 25px;box-shadow:0 4px 18px rgba(41,104,118,.18)}
+.header-inner{max-width:1260px;margin:auto}.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.78;font-weight:800}
+header h1{margin:6px 0 6px;font-size:28px;letter-spacing:-.02em}header p{margin:0;opacity:.9;font-size:14px;line-height:1.55}
+main{max-width:1260px;margin:0 auto;padding:20px 16px 34px}
+.tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap;background:rgba(255,255,255,.78);padding:8px;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);position:sticky;top:8px;z-index:10;backdrop-filter:blur(8px)}
+.tabs button{border:0;border-radius:12px;padding:10px 15px;font-weight:800;cursor:pointer;background:transparent;color:#49666d;font-size:13px;transition:.2s}
+.tabs button:hover{background:#eef7f6}.tabs button[aria-pressed="true"]{background:linear-gradient(120deg,#e2f5f1,#e8f1fb);color:#1c6f68;box-shadow:inset 0 0 0 1px #c6e7e1}
+.grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}
+.card.soft{background:linear-gradient(180deg,#fff,#fbfefe)}h2{font-size:18px;margin:0 0 12px;letter-spacing:-.02em}h3{font-size:13px;margin:17px 0 7px;color:#385b62}h4{margin:0 0 7px;font-size:13px}
+label{font-size:12.5px;display:block;margin:11px 0 5px;font-weight:700;color:#36555c}input[type=range]{width:100%;accent-color:var(--mint)}select,input[type=number]{width:100%;padding:9px;border:1px solid #cfe0de;border-radius:10px;font-size:13px;background:#fff;color:var(--ink)}
+.val{float:right;font-weight:900;color:var(--mint);font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.hint{font-size:11.5px;color:var(--mut);line-height:1.55;margin-top:6px}.tiny{font-size:10.7px;color:var(--mut);line-height:1.5}
+button.b{border:1px solid #d3e5e2;border-radius:999px;padding:7px 10px;font-weight:800;cursor:pointer;background:#f7fbfa;color:#3b6065;font-size:11.5px;margin:5px 4px 0 0}button.b.on{background:var(--mint2);border-color:#a9d8d0;color:#19756a}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:12px}.kpi{border:1px solid var(--line);border-radius:14px;padding:12px;background:linear-gradient(180deg,#fff,#fbfefe)}.kpi b{display:block;font-size:22px;letter-spacing:-.03em}.kpi span{font-size:10.7px;color:var(--mut);line-height:1.35}
+.icons{line-height:1;font-size:0;margin:11px 0;border:1px solid var(--line);border-radius:13px;padding:9px;background:#fbfdfd;max-height:175px;overflow:hidden}.icons i{display:inline-block;width:8px;height:8px;margin:1.2px;border-radius:2px}.lg{display:flex;gap:13px;flex-wrap:wrap;font-size:11px;color:var(--mut);margin-top:7px}.lg span{display:flex;align-items:center;gap:5px}.lg em{width:10px;height:10px;border-radius:3px;display:inline-block}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;margin-top:10px;overflow:hidden;border:1px solid var(--line);border-radius:12px}th,td{padding:8px;text-align:right;border-bottom:1px solid var(--line)}th{background:#f2f8f7;font-size:10.8px;color:#5a7278}tr:last-child td{border-bottom:0}th:first-child,td:first-child{text-align:left;font-weight:700}
+canvas{width:100%;height:290px;border:1px solid var(--line);border-radius:14px;background:#fff}.note{border:1px solid #cfe8e3;padding:11px 12px;background:#f0faf8;font-size:12.3px;line-height:1.65;margin-top:11px;border-radius:12px}.note.w{border-color:#f0d6c8;background:#fff7f2}.note.r{border-color:#eed1d6;background:#fff5f6}.note.v{border-color:#ddd5f0;background:#f8f5ff}.big{font-size:15px;font-weight:900}.formula{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f5f8f8;border:1px dashed #c8dbd8;border-radius:10px;padding:8px 10px;font-size:11.5px;line-height:1.5;margin-top:8px}
+.badge{display:inline-block;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900;background:var(--mint2);color:#207d72}.badge.sky{background:var(--sky2);color:#3a75b5}.badge.coral{background:var(--coral2);color:#b75f4d}.badge.violet{background:var(--violet2);color:#6a53ad}
+.split3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.mini{border:1px solid var(--line);border-radius:14px;padding:13px;background:#fff}.mini .metric{font-size:24px;font-weight:900;letter-spacing:-.03em;margin:4px 0}.arrow{font-weight:900;color:var(--mint)}.assumptions{margin-top:12px;padding:12px;border:1px dashed #bfd6d2;border-radius:13px;background:#fbfefd}.assumptions ul{margin:6px 0 0;padding-left:18px;font-size:11.3px;color:var(--mut);line-height:1.55}
+@media(max-width:960px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.split3{grid-template-columns:1fr}.tabs{position:static}}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><div class="eyebrow">Diagnostic Test Probability Lab</div><h1>진단검사 확률 실험실</h1><p>한국 국가암검진 실측값으로 확률 구조를 확인하고, ROC의 의사결정과 검진 편향을 개념 모형으로 분리해 탐구합니다.</p></div></header>
+<main>
+<div class="tabs">
+ <button data-t="bayes" aria-pressed="true">1. 양성예측도</button>
+ <button data-t="recon" aria-pressed="false">2. 분할표 재구성</button>
+ <button data-t="roc" aria-pressed="false">3. ROC와 오류 비용</button>
+ <button data-t="bias" aria-pressed="false">4. 검진 편향 모형</button>
+</div>
+
+<div class="grid" id="p-bayes">
+ <section class="card soft"><h2>조건 설정</h2>
+  <label>질병 비율(유효 사전확률) <span class="val" id="vPrev">0.449%</span></label><input type="range" id="prev" min="-4" max="-0.3" step="0.0001" value="-2.3473"><div class="hint">로그 눈금. KNCSP 2020의 CDR과 ICR을 각 분모 정의에 맞게 환산하면 약 0.449%입니다.</div>
+  <label>민감도 <span class="val" id="vSe">68.9%</span></label><input type="range" id="se" min="30" max="100" step="0.1" value="68.93">
+  <label>특이도 <span class="val" id="vSp">89.1%</span></label><input type="range" id="sp" min="30" max="100" step="0.1" value="89.09">
+  <h3>검사 프리셋</h3>
+  <button class="b on" data-p="kncsp20">KNCSP 2020</button><button class="b" data-p="kncsp09">KNCSP 2009</button><button class="b" data-p="abcs">ABCS-K</button><button class="b" data-p="ideal">민감도·특이도 99%</button>
+  <div class="hint" id="srcNote"></div>
+  <div class="note w">낮은 양성예측도는 낮은 질병 비율과 제한된 특이도가 함께 만든 결과입니다. 특히 선별검사처럼 사전확률이 낮은 상황에서는 위양성이 양성 결과의 큰 부분을 차지할 수 있습니다.</div>
+ </section>
+ <section class="card"><h2>1,000건으로 환산한 결과</h2><div class="kpis"><div class="kpi"><b id="kPPV">—</b><span>양성예측도</span></div><div class="kpi"><b id="kNPV">—</b><span>음성예측도</span></div><div class="kpi"><b id="kPos">—</b><span>양성 판정</span></div><div class="kpi"><b id="kFP">—</b><span>위양성</span></div></div>
+  <div class="icons" id="icons"></div><div class="lg"><span><em style="background:var(--tp)"></em>진짜 양성</span><span><em style="background:var(--fp)"></em>위양성</span><span><em style="background:var(--fn)"></em>위음성</span><span><em style="background:var(--tn)"></em>진짜 음성</span></div>
+  <table id="t2x2"></table><div class="note" id="bayesNote"></div><h3>질병 비율에 따른 양성예측도</h3><canvas id="cPPV"></canvas>
+ </section>
+</div>
+
+<div class="grid" id="p-recon" style="display:none">
+ <section class="card soft"><h2>공표값에서 2×2 표 재구성</h2><div class="hint">핵심은 <b>값의 크기보다 분모의 정의</b>입니다. CDR은 전체 검사 1,000건당, ICR은 음성 검사 1,000건당입니다.</div>
+  <label>연도 선택</label><select id="yr"><option value="2020">2020년</option><option value="2009">2009년</option></select><h3>논문 공표값</h3><table id="tPub"></table>
+  <div class="note v"><span class="badge violet">탐구 포인트</span><br>ICR을 전체 전체 검사 1,000건당 값처럼 바로 더하면 민감도가 어긋납니다. 먼저 음성 검사 수를 구한 뒤 ICR을 전체 검사 기준 위음성 수로 환산해야 합니다.</div>
+ </section>
+ <section class="card"><h2>재구성 결과</h2><div id="reconOut"></div></section>
+</div>
+
+<div class="grid" id="p-roc" style="display:none">
+ <section class="card soft"><h2>기준값 이동</h2><div class="hint">질병군과 비질병군 검사값이 동일분산 정규분포를 이룬다는 교육용 가정입니다. 기준값을 넘으면 양성으로 판정합니다.</div>
+  <label>분포 분리도 d′ <span class="val" id="vD">1.73</span></label><input type="range" id="dp" min="0.3" max="4" step="0.01" value="1.73">
+  <label>현재 기준값 <span class="val" id="vCut">0.90</span></label><input type="range" id="cut" min="-2" max="4" step="0.05" value="0.9">
+  <label>질병 비율 <span class="val" id="vPrev2">0.449%</span></label><input type="range" id="prev2" min="-4" max="-0.3" step="0.0001" value="-2.3473">
+  <h3>오류 비용</h3><label>위음성 1건 = 위양성 몇 건? <span class="val" id="vW">30</span></label><input type="range" id="wgt" min="1" max="500" step="1" value="30"><div class="hint">가중치뿐 아니라 질병 비율도 비용 최소 기준값을 바꿉니다. 이 가중치는 실측치가 아니라 의사결정 가정입니다.</div>
+ </section>
+ <section class="card"><h2>ROC와 비용 최소점</h2><div class="kpis"><div class="kpi"><b id="rSe">—</b><span>현재 기준 민감도</span></div><div class="kpi"><b id="rSp">—</b><span>현재 기준 특이도</span></div><div class="kpi"><b id="rAUC">—</b><span>AUC</span></div><div class="kpi"><b id="rCost">—</b><span>상대비용 /1,000건</span></div></div><canvas id="cROC"></canvas><div class="note" id="rocNote"></div></section>
+</div>
+
+<div class="grid" id="p-bias" style="display:none">
+ <section class="card soft"><h2>검진 편향 개념 모형</h2><div class="hint">특정 유방암 연구를 재현하는 자연사 모형이 아닙니다. 세 편향의 작동 원리를 <b>분리해서</b> 확인하는 결정론적 교육 모형입니다.</div>
+  <label>선행시간 <span class="val" id="vLead">3.0년</span></label><input type="range" id="lead" min="0" max="4.5" step="0.1" value="3">
+  <label>느린 종양 비율 <span class="val" id="vSlow">55%</span></label><input type="range" id="slow" min="0" max="90" step="1" value="55">
+  <label>비진행성 병변 비율 <span class="val" id="vNon">20%</span></label><input type="range" id="non" min="0" max="60" step="1" value="20">
+  <label>실제 5년 암사망 위험 감소 <span class="val" id="vEff">0%</span></label><input type="range" id="eff" min="0" max="40" step="1" value="0"><div class="hint">0%에서는 달력상의 사망 위험을 줄이는 치료·검진 이득이 없다고 둡니다. 이 값은 편향과 별개인 실제 효과 가정이며, 수정본에서는 각 생존율 계산에 함께 반영됩니다.</div>
+  <div class="assumptions"><b>고정 가정</b><ul><li>선행시간·과잉진단 모형의 진행암 기준 5년 생존율 40%</li><li>길이 편향: 빠른 종양 sojourn 0.5년, 느린 종양 3.0년, 검진 간격 2년</li><li>길이 편향 모형의 빠른 종양 5년 생존 30%, 느린 종양 80% (별도 개념 모형)</li><li>검출확률=min(sojourn/검진간격,1): 검진 시점 균등·검출가능 기간이 간격 이상이면 검진에서 포착된다는 단순화</li><li>비진행성 병변의 검진 검출률 90%</li></ul></div>
+ </section>
+ <section class="card"><h2>세 편향을 따로 보면</h2><div class="split3">
+  <div class="mini"><span class="badge sky">선행시간 편향</span><div class="metric" id="leadMetric">—</div><div class="tiny" id="leadText"></div></div>
+  <div class="mini"><span class="badge">길이 편향</span><div class="metric" id="lengthMetric">—</div><div class="tiny" id="lengthText"></div></div>
+  <div class="mini"><span class="badge coral">과잉진단</span><div class="metric" id="overMetric">—</div><div class="tiny" id="overText"></div></div>
+ </div>
+ <h3>실제 사망 감소와 지표 변화의 구분</h3><canvas id="cBias"></canvas><div class="note r" id="biasNote"></div>
+ </section>
+</div>
+</main>
+<script src="frontend.js"></script>
+<!-- 기존 인라인 계산 코드는 Python 백엔드로 이전되어 비활성화했습니다.
+<script>
+const $=id=>document.getElementById(id);
+const PRESETS={
+ kncsp20:{se:68.93,sp:89.09,prev:0.44946,n:'KNCSP 2020: RR 11.17%, CDR 3.10/1000 전체 검사, ICR 1.57/1000 음성 검사. 분모를 맞춰 환산한 유효 사전확률 약 0.449%.'},
+ kncsp09:{se:67.30,sp:82.93,prev:0.21540,n:'KNCSP 2009: RR 17.18%, CDR 1.45/1000 전체 검사, ICR 0.85/1000 음성 검사. 환산한 유효 사전확률 약 0.215%.'},
+ abcs:{se:86.5,sp:81.1,prev:0.309,n:'ABCS-K 2005-2010: CDR 2.69/1000과 ICR 0.50/1000(음성 검사)을 KNCSP와 같은 방식으로 환산하면 유효 사전확률은 약 0.309%이며, 이 값으로 공표 PPV 1.4%가 거의 재현됩니다.'},
+ ideal:{se:99,sp:99,prev:0.44946,n:'가상 검사: 민감도와 특이도를 각각 99%로 둔 교육용 예시.'}
+};
+const KNCSP={
+ 2020:{RR:11.17,PPV:2.77,CDR:3.10,ICR:1.57,se:68.93,sp:89.09},
+ 2009:{RR:17.18,PPV:0.84,CDR:1.45,ICR:0.85,se:67.30,sp:82.93}
+};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-pressed',x===b));['bayes','recon','roc','bias'].forEach(t=>$('p-'+t).style.display=(t===b.dataset.t)?'grid':'none');if(b.dataset.t==='roc')drawROC();if(b.dataset.t==='bias')runBias();});
+function setLogSlider(id,pct){$(id).value=Math.log10(pct/100)}
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-p]').forEach(x=>x.classList.remove('on'));b.classList.add('on');const p=PRESETS[b.dataset.p];$('se').value=p.se;$('sp').value=p.sp;setLogSlider('prev',p.prev);$('srcNote').textContent=p.n;renderBayes();});
+function renderBayes(){const prev=Math.pow(10,+$('prev').value),se=+$('se').value/100,sp=+$('sp').value/100;$('vPrev').textContent=(prev*100).toFixed(prev<0.001?4:3)+'%';$('vSe').textContent=(se*100).toFixed(1)+'%';$('vSp').textContent=(sp*100).toFixed(1)+'%';const N=1000,D=N*prev,TP=D*se,FN=D-TP,TN=(N-D)*sp,FP=(N-D)-TN;const ppv=TP/(TP+FP),npv=TN/(TN+FN);$('kPPV').textContent=(ppv*100).toFixed(2)+'%';$('kNPV').textContent=(npv*100).toFixed(2)+'%';$('kPos').textContent=(TP+FP).toFixed(1)+'건';$('kFP').textContent=FP.toFixed(1)+'건';
+ const nTP=Math.round(TP),nFN=Math.round(FN),nFP=Math.round(FP);let h='';for(let i=0;i<nTP;i++)h+='<i style="background:#24946e"></i>';for(let i=0;i<nFN;i++)h+='<i style="background:#c95d6c"></i>';for(let i=0;i<nFP;i++)h+='<i style="background:#e49a55"></i>';for(let i=nTP+nFN+nFP;i<1000;i++)h+='<i style="background:#c8d8dc"></i>';$('icons').innerHTML=h;
+ $('t2x2').innerHTML='<tr><th>1,000건 기준</th><th>검사 양성</th><th>검사 음성</th><th>합계</th></tr><tr><td>실제 병 있음</td><td>'+TP.toFixed(2)+'</td><td>'+FN.toFixed(2)+'</td><td>'+D.toFixed(2)+'</td></tr><tr><td>실제 병 없음</td><td>'+FP.toFixed(2)+'</td><td>'+TN.toFixed(2)+'</td><td>'+(N-D).toFixed(2)+'</td></tr><tr><td>합계</td><td>'+(TP+FP).toFixed(2)+'</td><td>'+(TN+FN).toFixed(2)+'</td><td>1000</td></tr>';
+ const ratio=FP/Math.max(TP,1e-9);$('bayesNote').innerHTML='양성 판정 약 <b>'+(TP+FP).toFixed(1)+'건</b> 가운데 진짜 양성은 <b>'+TP.toFixed(2)+'건</b>입니다. 진짜 양성 1건당 위양성은 약 <b class="big">'+ratio.toFixed(1)+'건</b>이며, 이 비율은 민감도·특이도와 사전확률이 함께 결정합니다.';drawPPV(se,sp,prev);}
+function prepCanvas(cv){const d=window.devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*d;cv.height=h*d;const c=cv.getContext('2d');c.setTransform(d,0,0,d,0,0);return {c,w,h}}
+function drawPPV(se,sp,prev){const {c,w,h}=prepCanvas($('cPPV')),L=52,R=18,T=18,B=38;const xs=[],ys=[];for(let i=0;i<=180;i++){const log=-4+i*(3.7/180),p=Math.pow(10,log),v=se*p/(se*p+(1-sp)*(1-p));xs.push(log);ys.push(v)};c.clearRect(0,0,w,h);c.strokeStyle='#dce8e6';c.lineWidth=1;for(let y=0;y<=1;y+=.25){const py=T+(1-y)*(h-T-B);c.beginPath();c.moveTo(L,py);c.lineTo(w-R,py);c.stroke();c.fillStyle='#6e8388';c.font='11px system-ui';c.textAlign='right';c.fillText(Math.round(y*100)+'%',L-7,py+4)}c.strokeStyle='#2f9d8f';c.lineWidth=2.6;c.beginPath();xs.forEach((x,i)=>{const px=L+(x+4)/3.7*(w-L-R),py=T+(1-ys[i])*(h-T-B);i?c.lineTo(px,py):c.moveTo(px,py)});c.stroke();const x0=Math.log10(prev),pp=se*prev/(se*prev+(1-sp)*(1-prev)),px=L+(x0+4)/3.7*(w-L-R),py=T+(1-pp)*(h-T-B);c.fillStyle='#df7b67';c.beginPath();c.arc(px,py,5,0,Math.PI*2);c.fill();c.fillStyle='#5f777c';c.font='11px system-ui';c.textAlign='center';[-4,-3,-2,-1,-.3].forEach(v=>{const x=L+(v+4)/3.7*(w-L-R);c.fillText((Math.pow(10,v)*100).toFixed(v<-2?2:1)+'%',x,h-13)});c.fillText('질병 비율(로그 눈금)',(L+w-R)/2,h-1)}
+['prev','se','sp'].forEach(id=>$(id).oninput=renderBayes);
+function reconstruct(d){const N=1000,pos=N*d.RR/100,neg=N-pos,TP=d.CDR,FP=pos-TP,FN=d.ICR*neg/1000,TN=neg-FN;return {N,pos,neg,TP,FP,FN,TN,se:TP/(TP+FN)*100,sp:TN/(TN+FP)*100,ppv:TP/(TP+FP)*100,prev:(TP+FN)/N*100,naiveSe:d.CDR/(d.CDR+d.ICR)*100}}
+function renderRecon(){const y=$('yr').value,d=KNCSP[y],r=reconstruct(d);$('tPub').innerHTML='<tr><th>지표</th><th>공표값</th><th>분모</th></tr><tr><td>재소환율 RR</td><td>'+d.RR.toFixed(2)+'%</td><td>전체 검사</td></tr><tr><td>PPV</td><td>'+d.PPV.toFixed(2)+'%</td><td>양성 검사</td></tr><tr><td>CDR</td><td>'+d.CDR.toFixed(2)+'/1000</td><td>전체 검사</td></tr><tr><td>ICR</td><td>'+d.ICR.toFixed(2)+'/1000</td><td><b>음성 검사</b></td></tr><tr><td>민감도 / 특이도</td><td>'+d.se.toFixed(2)+'% / '+d.sp.toFixed(2)+'%</td><td>질병 유무별</td></tr>';
+ $('reconOut').innerHTML='<div class="kpis"><div class="kpi"><b>'+r.prev.toFixed(3)+'%</b><span>분모를 맞춘 유효 사전확률</span></div><div class="kpi"><b>'+r.se.toFixed(2)+'%</b><span>재구성 민감도</span></div><div class="kpi"><b>'+r.sp.toFixed(2)+'%</b><span>재구성 특이도</span></div><div class="kpi"><b>'+r.ppv.toFixed(2)+'%</b><span>재구성 PPV</span></div></div><table><tr><th>1,000건 기준</th><th>검사 양성</th><th>검사 음성</th></tr><tr><td>실제 암</td><td>'+r.TP.toFixed(3)+'</td><td>'+r.FN.toFixed(3)+'</td></tr><tr><td>암 아님</td><td>'+r.FP.toFixed(3)+'</td><td>'+r.TN.toFixed(3)+'</td></tr></table><div class="formula">음성 검사 = 1000 × (1 - RR) = '+r.neg.toFixed(1)+'<br>위음성 FN = ICR × 음성 검사 / 1000 = '+d.ICR.toFixed(2)+' × '+r.neg.toFixed(1)+' /1000 = '+r.FN.toFixed(3)+'<br>민감도 = TP/(TP+FN) = '+r.se.toFixed(2)+'%</div><div class="note"><b>단순히 CDR+ICR을 더하면</b> 민감도는 '+r.naiveSe.toFixed(2)+'%가 되어 공표값 '+d.se.toFixed(2)+'%와 어긋납니다. ICR의 분모를 음성 검사로 맞춰 환산하면 차이는 반올림 수준으로 줄어듭니다.</div>'}
+$('yr').onchange=renderRecon;
+function erf(x){const s=x>=0?1:-1,a=Math.abs(x),t=1/(1+0.3275911*a),y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-a*a);return s*y}
+const Phi=z=>.5*(1+erf(z/Math.sqrt(2)));
+function drawROC(){const d=+$('dp').value,cut=+$('cut').value,prev=Math.pow(10,+$('prev2').value),W=+$('wgt').value;$('vD').textContent=d.toFixed(2);$('vCut').textContent=cut.toFixed(2);$('vPrev2').textContent=(prev*100).toFixed(prev<.001?4:3)+'%';$('vW').textContent=W;const se=1-Phi(cut-d),sp=Phi(cut),auc=Phi(d/Math.sqrt(2)),cost=1000*(prev*(1-se)*W+(1-prev)*(1-sp));$('rSe').textContent=(se*100).toFixed(1)+'%';$('rSp').textContent=(sp*100).toFixed(1)+'%';$('rAUC').textContent=auc.toFixed(3);$('rCost').textContent=cost.toFixed(1);
+ let best={cost:Infinity,x:0,se:0,sp:0};for(let x=-3;x<=5;x+=.005){const s=1-Phi(x-d),p=Phi(x),co=prev*(1-s)*W+(1-prev)*(1-p);if(co<best.cost)best={cost:co,x,se:s,sp:p}};
+ const {c,w,h}=prepCanvas($('cROC')),L=48,R=22,T=18,B=38;c.clearRect(0,0,w,h);c.strokeStyle='#dce8e6';for(let z=0;z<=1;z+=.25){const x=L+z*(w-L-R),y=T+(1-z)*(h-T-B);c.beginPath();c.moveTo(x,T);c.lineTo(x,h-B);c.stroke();c.beginPath();c.moveTo(L,y);c.lineTo(w-R,y);c.stroke()}c.strokeStyle='#b7c9cd';c.setLineDash([5,5]);c.beginPath();c.moveTo(L,h-B);c.lineTo(w-R,T);c.stroke();c.setLineDash([]);c.strokeStyle='#4f8fd8';c.lineWidth=2.6;c.beginPath();for(let x=-3,i=0;x<=5;x+=.02,i++){const s=1-Phi(x-d),f=1-Phi(x),px=L+f*(w-L-R),py=T+(1-s)*(h-T-B);i?c.lineTo(px,py):c.moveTo(px,py)}c.stroke();function dot(x,se,sp,col,r){const px=L+(1-sp)*(w-L-R),py=T+(1-se)*(h-T-B);c.fillStyle=col;c.beginPath();c.arc(px,py,r,0,Math.PI*2);c.fill()}dot(cut,se,sp,'#df7b67',5);dot(best.x,best.se,best.sp,'#2f9d8f',5);c.fillStyle='#61777d';c.font='11px system-ui';c.textAlign='center';c.fillText('위양성률 (1-특이도)',(L+w-R)/2,h-5);c.save();c.translate(13,(T+h-B)/2);c.rotate(-Math.PI/2);c.fillText('민감도',0,0);c.restore();$('rocNote').innerHTML='현재 설정에서 비용 최소 기준값은 <b>'+best.x.toFixed(2)+'</b> (민감도 '+(best.se*100).toFixed(1)+'%, 특이도 '+(best.sp*100).toFixed(1)+'%)입니다. <b>오류 가중치와 질병 비율을 바꾸면 최적점이 함께 이동</b>합니다. 따라서 최적 기준값은 검사 성능만으로 정해지지 않습니다.'}
+['dp','cut','prev2','wgt'].forEach(id=>$(id).oninput=drawROC);
+function runBias(){const lead=+$('lead').value,slow=+$('slow').value/100,non=+$('non').value/100,eff=+$('eff').value/100;$('vLead').textContent=lead.toFixed(1)+'년';$('vSlow').textContent=(slow*100).toFixed(0)+'%';$('vNon').textContent=(non*100).toFixed(0)+'%';$('vEff').textContent=(eff*100).toFixed(0)+'%';
+ // 실제 효과는 5년 사망위험의 상대감소로 정의
+ const S5base=.40,S5eff=1-(1-S5base)*(1-eff);
+ // 1) lead-time: adjusted baseline survival, then diagnosis-time shift
+ const lambda=-Math.log(S5eff)/5,leadS=Math.exp(-lambda*Math.max(5-lead,0));$('leadMetric').innerHTML=(S5eff*100).toFixed(1)+'% <span class="arrow">→</span> '+(leadS*100).toFixed(1)+'%';$('leadText').textContent='실제 효과를 반영한 진행암 기준 5년 생존율에서, 사망 시점 분포는 그대로 두고 진단 시점만 '+lead.toFixed(1)+'년 앞당긴 선행시간 편향을 계산합니다.';
+ // 2) length bias: separate subtype-mixture model
+ const intv=2,sojFast=.5,sojSlow=3,pFast=Math.min(1,sojFast/intv),pSlow=Math.min(1,sojSlow/intv),detSlow=slow*pSlow,detFast=(1-slow)*pFast,share=detSlow/Math.max(detSlow+detFast,1e-9);
+ const fastS=1-(1-.30)*(1-eff),slowS=1-(1-.80)*(1-eff),baseMix=slow*slowS+(1-slow)*fastS,screenMix=share*slowS+(1-share)*fastS;$('lengthMetric').innerHTML=(baseMix*100).toFixed(1)+'% <span class="arrow">→</span> '+(screenMix*100).toFixed(1)+'%';$('lengthText').textContent='느린 종양 비율은 전체 '+(slow*100).toFixed(0)+'% → 검진 발견암 '+(share*100).toFixed(1)+'%. 이에 따른 예시 5년 생존율은 '+(baseMix*100).toFixed(1)+'% → '+(screenMix*100).toFixed(1)+'%입니다.';
+ // 3) overdiagnosis
+ const N=10000,prog=N*(1-non),detNon=N*non*.90,baseSurv=prog*S5eff,screenDx=prog+detNon,screenSurv=baseSurv+detNon,overS=screenSurv/Math.max(screenDx,1);$('overMetric').innerHTML=(S5eff*100).toFixed(1)+'% <span class="arrow">→</span> '+(overS*100).toFixed(1)+'%';$('overText').textContent='비진행성 병변이 추가 진단되면 분모와 생존자 수가 함께 늘어납니다. 실제 효과는 진행암 생존에만 별도로 반영됩니다.';
+ const baseDeaths=prog*(1-S5base),deaths=prog*(1-S5eff);drawBias([[S5eff*100,leadS*100],[baseMix*100,screenMix*100],[S5eff*100,overS*100]],baseDeaths,deaths);$('biasNote').innerHTML=(eff===0?'<b>실제 5년 암사망 위험 감소를 0%로 두었습니다.</b> ':('<b>진행암의 5년 사망위험을 '+(eff*100).toFixed(0)+'% 상대적으로 줄이는 실제 효과를 반영했습니다.</b> '))+'세 편향은 서로 다른 개념 모형이므로 각자 자신의 기준값과 비교합니다. 편향에 따른 생존율 상승과 실제 사망위험 감소를 구분해 해석하세요.'}
+function drawBias(pairs,du,ds){const {c,w,h}=prepCanvas($('cBias')),L=48,R=26,T=30,B=54;c.clearRect(0,0,w,h);const labs=['선행시간','길이 편향','과잉진단'],cols=['#4f8fd8','#2f9d8f','#df7b67'];for(let y=0;y<=100;y+=25){const py=T+(1-y/100)*(h-T-B);c.strokeStyle='#e1ebea';c.beginPath();c.moveTo(L,py);c.lineTo(w-R,py);c.stroke();c.fillStyle='#75878b';c.font='10px system-ui';c.textAlign='right';c.fillText(y+'%',L-6,py+3)}const gap=(w-L-R)/3;pairs.forEach((pair,i)=>{const [a,b]=pair,bw=gap*.26,x=L+i*gap+gap*.17;[[a,'#c4d0d3','기준'],[b,cols[i],'편향 후']].forEach((z,j)=>{const v=z[0],xx=x+j*bw*1.35,bh=(h-T-B)*v/100;c.fillStyle=z[1];c.fillRect(xx,h-B-bh,bw,bh);c.fillStyle='#24434a';c.font='10px system-ui';c.textAlign='center';c.fillText(v.toFixed(1)+'%',xx+bw/2,h-B-bh-5);c.fillStyle='#6a7d81';c.fillText(z[2],xx+bw/2,h-B+14)});c.fillStyle='#425e64';c.font='11px system-ui';c.fillText(labs[i],L+i*gap+gap/2,h-B+32)});c.fillStyle='#24434a';c.textAlign='left';c.font='11px system-ui';c.fillText('각 편향 모형의 기준값과 편향 후 5년 생존율',L,T-10);c.fillStyle='#6a7d81';c.fillText('진행암 5년 사망자(10,000 병변 가정): '+Math.round(du)+' → '+Math.round(ds),L,h-6)}
+['lead','slow','non','eff'].forEach(id=>$(id).oninput=runBias);
+$('srcNote').textContent=PRESETS.kncsp20.n;renderBayes();renderRecon();addEventListener('resize',()=>{renderBayes();if($('p-roc').style.display==='grid')drawROC();if($('p-bias').style.display==='grid')runBias();});
+</script>
+-->
+</body></html>
